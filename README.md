@@ -17,10 +17,10 @@ $ audibly -name=greeting -- echo hello, world
 # this will say "hurrah"
 $ audibly -success=hurrah -- echo hello, world
 
-# this will say "oh noes"
+# this will say "oh noes" and exit with status 1
 $ audibly -failure="oh noes" false
 
-# this will say "status 42"
+# this will say "status 42" and exit with status 42
 $ audibly -failure='status {{.Status}}' sh -c 'exit 42'
 ```
 
