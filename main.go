@@ -18,6 +18,8 @@ var (
 	failure = flag.String("failure", "failure: {{.Name}}", "say this message on failure")
 )
 
+var templates = template.New("speech")
+
 type Info struct {
 	name string
 	Cmd  *exec.Cmd
@@ -77,19 +79,13 @@ func report(i *Info) error {
 }
 
 func format(i *Info) (string, error) {
-	var tmpl string
-	if i.Cmd.ProcessState.Success() {
-		tmpl = *success
-	} else {
-		tmpl = *failure
+	tmpl := templates.Lookup("success")
+	if !i.Cmd.ProcessState.Success() {
+		tmpl = templates.Lookup("failure")
 	}
 
-	t, err := template.New("speech").Parse(tmpl)
-	if err != nil {
-		return "", err
-	}
 	var buf bytes.Buffer
-	if err := t.Execute(&buf, i); err != nil {
+	if err := tmpl.Execute(&buf, i); err != nil {
 		return "", err
 	}
 	return buf.String(), nil
@@ -120,6 +116,16 @@ func main() {
 	flag.Parse()
 	if flag.NArg() == 0 {
 		flag.Usage()
+		os.Exit(2)
+	}
+
+	// exit 2 here as we consider these usage errors
+	if _, err := templates.New("success").Parse(*success); err != nil {
+		log.Print(err)
+		os.Exit(2)
+	}
+	if _, err := templates.New("failure").Parse(*failure); err != nil {
+		log.Print(err)
 		os.Exit(2)
 	}
 

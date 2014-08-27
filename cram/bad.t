@@ -10,3 +10,7 @@
   ESPEAK BORK
   audibly: espeak: exit status 42
   [1]
+
+  $ audibly --success='{{' true
+  audibly: template: success:1: unexpected unclosed action in command
+  [2]
