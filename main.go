@@ -12,12 +12,6 @@ import (
 	"text/template"
 )
 
-var (
-	name    = flag.String("name", "", "how to identify this run (default: basename of command)")
-	success = flag.String("success", "success: {{.Name}}", "say this message on success")
-	failure = flag.String("failure", "failure: {{.Name}}", "say this message on failure")
-)
-
 var templates = template.New("speech")
 
 type Info struct {
@@ -26,8 +20,8 @@ type Info struct {
 }
 
 func (i *Info) Name() string {
-	if *name != "" {
-		return *name
+	if i.name != "" {
+		return i.name
 	}
 	return filepath.Base(i.Cmd.Args[0])
 }
@@ -48,9 +42,10 @@ func (i *Info) Status() int {
 	return 3
 }
 
-func run(args []string) (*Info, error) {
+func run(name string, args []string) (*Info, error) {
 	i := &Info{
-		Cmd: exec.Command(args[0], args[1:]...),
+		name: name,
+		Cmd:  exec.Command(args[0], args[1:]...),
 	}
 	i.Cmd.Stdin = os.Stdin
 	i.Cmd.Stdout = os.Stdout
@@ -112,6 +107,12 @@ func main() {
 	log.SetFlags(0)
 	log.SetPrefix(prog + ": ")
 
+	var (
+		name    = flag.String("name", "", "how to identify this run (default: basename of command)")
+		success = flag.String("success", "success: {{.Name}}", "say this message on success")
+		failure = flag.String("failure", "failure: {{.Name}}", "say this message on failure")
+	)
+
 	flag.Usage = usage
 	flag.Parse()
 	if flag.NArg() == 0 {
@@ -129,7 +130,7 @@ func main() {
 		os.Exit(2)
 	}
 
-	i, err := run(flag.Args())
+	i, err := run(*name, flag.Args())
 	if err != nil {
 		log.Fatalf("starting command: %v", err)
 	}
