@@ -3,9 +3,9 @@
 Run it like `audibly COMMAND [ARGS..]`, and `audibly` will report the
 success or error of `COMMAND` with two different sounds.
 
-It currently uses [eSpeak](http://espeak.sourceforge.net/) as the
-speech synthesizer, and requires it to be installed. This may change
-later.
+It currently uses [eSpeak NG](https://github.com/espeak-ng/espeak-ng)
+as the speech synthesizer, and requires it to be installed.
+This may change later.
 
 ``` console
 # this will say "success: echo"
